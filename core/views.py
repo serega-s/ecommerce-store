@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.views import generic
 from product.models import Category, Product
 
@@ -17,6 +18,10 @@ class ShopView(generic.ListView):
     def active_category(self):
         return self.request.GET.get('category', '')
 
+    @property
+    def query(self):
+        return self.request.GET.get('query', '')
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
@@ -25,8 +30,16 @@ class ShopView(generic.ListView):
         return context
 
     def get_queryset(self):
+        queryset = super().get_queryset()
+
         active_category = self.active_category
+        query = self.query
+
         if active_category:
-            return Product.objects.filter(category__slug=active_category)
-        else:
-            return super().get_queryset()
+            queryset = queryset.filter(category__slug=active_category)
+
+        if query:
+            queryset = queryset.filter(
+                Q(name__icontains=query) | Q(description__icontains=query))
+
+        return queryset
