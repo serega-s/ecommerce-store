@@ -22,7 +22,7 @@ class ShopView(generic.ListView):
     def query(self):
         return self.request.GET.get('query', '')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['active_category'] = self.active_category

@@ -14,7 +14,8 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     price = models.IntegerField()
@@ -26,3 +27,7 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def get_display_price(self):
+        return self.price / 100
