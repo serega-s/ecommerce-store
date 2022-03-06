@@ -4,13 +4,13 @@ from product.models import Category, Product
 
 
 class FrontPageView(generic.ListView):
-    queryset = Product.objects.all()[0:8]
+    queryset = Product.objects.select_related('category').all()[0:8]
     context_object_name = 'products'
     template_name = 'core/frontpage.html'
 
 
 class ShopView(generic.ListView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('category').all()
     context_object_name = 'products'
     template_name = 'core/shop.html'
 
