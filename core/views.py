@@ -1,10 +1,10 @@
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.views import generic
 from product.models import Category, Product
 
 
 class FrontPageView(generic.ListView):
-    queryset = Product.objects.select_related('category').all()[0:8]
+    queryset = Product.objects.select_related('category').all()[:8]
     context_object_name = 'products'
     template_name = 'core/frontpage.html'
 
@@ -15,12 +15,12 @@ class ShopView(generic.ListView):
     template_name = 'core/shop.html'
 
     @property
-    def active_category(self):
-        return self.request.GET.get('category', '')
-
-    @property
     def query(self):
         return self.request.GET.get('query', '')
+
+    @property
+    def active_category(self):
+        return self.request.GET.get('category', '')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -32,13 +32,10 @@ class ShopView(generic.ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        active_category = self.active_category
-        query = self.query
-
-        if active_category:
+        if active_category := self.active_category:
             queryset = queryset.filter(category__slug=active_category)
 
-        if query:
+        if query := self.query:
             queryset = queryset.filter(
                 Q(name__icontains=query) | Q(description__icontains=query))
 
