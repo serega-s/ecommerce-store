@@ -1,6 +1,14 @@
+from django.contrib.auth import login
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.db.models import Count, Q
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.views import generic
 from product.models import Category, Product
+
+from .forms import SignUpForm
 
 
 class FrontPageView(generic.ListView):
@@ -40,3 +48,35 @@ class ShopView(generic.ListView):
                 Q(name__icontains=query) | Q(description__icontains=query))
 
         return queryset
+
+
+def register(request):
+    return
+
+
+class SignUpView(generic.CreateView):
+    form_class = SignUpForm
+    template_name = 'core/signup.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+
+        return redirect('frontpage')
+
+
+class LogInView(LoginView):
+    form = AuthenticationForm
+    template_name = 'core/login.html'
+
+    def get_success_url(self):
+        return reverse_lazy('frontpage')
+
+
+class LogOutView(generic.RedirectView):
+    url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        auth_logout(request)
+        return super(LogOutView, self).get(request, *args, **kwargs)

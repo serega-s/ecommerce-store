@@ -6,10 +6,6 @@ from .cart import Cart
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
-    cart.add(product_id)
+    cart.add(product_id, update_quantity=True)
 
-    context = {
-        'cart': cart
-    }
-
-    return render(request, 'cart/menu_cart.html', context)
+    return render(request, 'cart/menu_cart.html')
