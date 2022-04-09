@@ -1,3 +1,7 @@
+from io import BytesIO
+
+from PIL.Image import Image
+from django.core.files import File
 from django.db import models
 
 
@@ -13,12 +17,27 @@ class Category(models.Model):
         return self.name
 
 
+def make_thumbnail(image, size=(300, 300)):
+    img = Image.open(image)
+    img.convert('RGB')
+    img.thumbnail(size)
+
+    thumb_io = BytesIO()
+    img.save(thumb_io, 'JPEG', quality=85)
+
+    thumbnail = File(thumb_io, name=image.name)
+
+    return thumbnail
+
+
 class Product(models.Model):
     category = models.ForeignKey(
         Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     price = models.IntegerField()
+    image = models.ImageField(upload_to='uploads/', blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='uploads/', blank=True, null=True)
     slug = models.SlugField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -28,6 +47,17 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    @property
     def get_display_price(self):
         return self.price / 100
+
+    def get_thumbnail(self):
+        if self.thumbnail:
+            return self.thumbnail.url
+        else:
+            if self.image:
+                self.thumbnail = make_thumbnail(self.image)
+                self.save()
+
+                return self.thumbnail.url
+            else:
+                return 'https://via.placeholder.com/240x240x.jpg'
