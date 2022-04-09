@@ -31,6 +31,9 @@ SESSION_COOKIE_AGE = 86400
 CART_SESSION_ID = 'cart'
 
 
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'logout'
+
 # Application definition
 
 INSTALLED_APPS = [
