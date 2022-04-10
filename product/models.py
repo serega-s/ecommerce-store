@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from PIL.Image import Image
+from PIL import Image
 from django.core.files import File
 from django.db import models
 
@@ -47,6 +47,7 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @property
     def get_display_price(self):
         return self.price / 100
 
