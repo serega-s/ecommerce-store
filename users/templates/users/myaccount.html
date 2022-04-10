@@ -8,7 +8,6 @@
 
     <div class="mb-6">
       <strong>Name: </strong>{{ request.user.get_full_name }}<br>
-      <strong>Username: </strong>{{ request.user.username }}<br>
       <strong>E-mail: </strong>{{ request.user.email }}<br>
 
       <a href="{% url 'edit_myaccount' %}"
