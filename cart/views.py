@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
 
+from product.models import Product
 from .cart import Cart
 
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
-    cart.add(product_id, update_quantity=True)
+    product = get_object_or_404(Product, id=product_id)
+    cart.add(product, update_quantity=True)
 
     return render(request, 'cart/menu_cart.html')
 
