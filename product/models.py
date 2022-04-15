@@ -1,8 +1,11 @@
 from io import BytesIO
 
 from PIL import Image
+from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.db import models
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -47,6 +50,20 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    # @property
+    # def get_avg_rating(self):
+    #     reviews = Review.objects.filter(product=self)
+    #     count = len(reviews)
+    #     summary = 0
+    #     try:
+    #         for rvw in reviews:
+    #             summary += rvw.rating
+    #         return (int(summary / count))
+    #     except ZeroDivisionError:
+    #         return 0
+
+    #     return Product.objects.all().select_related('category').annotate(rating=Avg('product__reviews__rate')
+
     @property
     def get_display_price(self):
         return self.price / 100
@@ -62,3 +79,17 @@ class Product(models.Model):
                 return self.thumbnail.url
             else:
                 return 'https://via.placeholder.com/240x240x.jpg'
+
+#
+# class Review(models.Model):
+#     RATE_CHOICES = [
+#         (1, 'I hated it'),
+#         (2, 'I didnt like it'),
+#         (3, 'it was ok'),
+#         (4, 'I liked it'),
+#         (5, 'I loved it'),
+#     ]
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+#     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+#     content = models.CharField(max_length=500)
+#     rate = models.PositiveSmallIntegerField(choices=RATE_CHOICES)
