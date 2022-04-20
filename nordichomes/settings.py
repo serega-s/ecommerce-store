@@ -20,6 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-9-smi%f=tbs2tc&0hkyd4bos!4*v2o*58k_6)7f+_mt!s=patj'
+STRIPE_API_KEY_PUBLISHABLE = 'pk_test_51IvhxnKNo34N6RzwMbsFZRZQGaPGziB8lpQS3uestRbXSImdP13uGGxUEnPDbL5rI5lyn96535KudykixqBKv8EF00NEpQwSXu'
+STRIPE_API_KEY_HIDDEN = 'sk_test_51IvhxnKNo34N6RzwNOB0rcUgi8UMVEdtTpNukWmF8WVM0Ch7DGKeaatpGwUDYcrOIKsRmb6gc3dTNcVOXotFebaH00U0MxkYcH'
+
+SUCCESS_URL = 'http://127.0.0.1:8000/cart/success/'
+CANCEL_URL = 'http://127.0.0.1:8000/cart/'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
