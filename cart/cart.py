@@ -98,7 +98,7 @@ class Cart(object):
         self.session.modified = True
 
     def get_item(self, product_id):
-        if product_id in self.cart:
+        if str(product_id) in self.cart:
             return self.cart[str(product_id)]
         else:
             return None
