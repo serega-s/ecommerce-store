@@ -4,10 +4,10 @@
 
 {% block content %}
   <div class="max-w-6xl mx-auto flex flex-wrap items-start py-6 px-6 xl:px-0">
-    <form method="post" action="{% url 'start_order' %}">
+    <form method="post" action=".">
       {% csrf_token %}
       <div class="products w-full lg:w-3/4">
-        <h1 class="mb-5 text-3xl">Checkout</h1>
+        <h1 class="mb-5 text-3xl">Add Address</h1>
 
         <div class="w-full pr-6">
           <div class="mb-6 p-6 bg-gray-100 rounded-xl">
@@ -80,7 +80,7 @@
         </div>
 
         <button type="submit" class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white">
-          Confirm checkout
+          Submit
         </button>
       </div>
     </form>
