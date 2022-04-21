@@ -14,6 +14,7 @@
           <div class="mb-2">
             <label for="address" class="inline-block mb-2">Address
               <select name="address" class="w-full w-full p-5 rounded-xl">
+                <option value="">Select address</option>
                 {% for address in request.user.shipping.all %}
                   <option value="{{ address.id }}">
                     {{ address }}
@@ -31,7 +32,7 @@
             Radio Input to select payment method...
           </div>
         </div>
-        <div class="mb-6 p-6 bg-gray-100 rounded-xl" id="errors">
+        <div class="mb-6 p-6 bg-red-100 rounded-xl" id="errors" hidden>
         </div>
 
       </div>
@@ -44,7 +45,7 @@
         <span>{{ cart.get_total_cost }}</span>
       </div>
 
-      <button type="submit" id="buy"
+      <button type="submit"
               class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white">
         Confirm checkout
       </button>
@@ -55,13 +56,26 @@
 {% block scripts %}
   <script type="application/javascript" src="https://js.stripe.com/v3/"></script>
   <script>
-    const buyButton = document.getElementById("buy")
+    const buyButton = document.querySelector("button[type=submit]")
     const selectAddress = document.querySelector("select[name=address]")
+    const errorsEl = document.querySelector("#errors")
 
     const validateForm = (data) => {
       let errors = []
       if (!data.address) {
         errors.push("Address must be selected")
+      }
+
+      let html = "<ul>"
+      if (errors.length) {
+        errors.forEach((error) => {
+          html += `<li>${error}</li>`
+        })
+        errorsEl.insertAdjacentHTML("beforeend", `${html}</ul>`)
+        errorsEl.style.display = "block"
+      } else {
+        errorsEl.insertAdjacentHTML("beforeend", ``)
+        errorsEl.style.display = "none"
       }
 
       return errors

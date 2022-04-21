@@ -1,4 +1,3 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.views import generic, View
 
@@ -6,12 +5,21 @@ from product.models import Product
 from .cart import Cart
 
 
-def add_to_cart(request, product_id):
-    cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    cart.add(product, update_quantity=True)
+#
+# def add_to_cart(request, product_id):
+#     cart = Cart(request)
+#     product = get_object_or_404(Product, id=product_id)
+#     cart.add(product, update_quantity=True)
+#
+#     return render(request, 'cart/menu_cart.html')
 
-    return render(request, 'cart/menu_cart.html')
+
+class CartView(generic.TemplateView):
+    template_name = 'cart/cart.html'
+
+
+class SuccessCartView(generic.TemplateView):
+    template_name = 'cart/success.html'
 
 
 class AddToCartView(View):
@@ -21,18 +29,6 @@ class AddToCartView(View):
         cart.add(product, update_quantity=True)
 
         return render(request, 'cart/menu_cart.html')
-
-
-class CartView(generic.TemplateView):
-    template_name = 'cart/cart.html'
-
-
-def hx_menu_cart(request):
-    return render(request, 'cart/menu_cart.html')
-
-
-def hx_cart_total(request):
-    return render(request, 'cart/partials/cart_total.html')
 
 
 class UpdateCartView(View):
@@ -67,3 +63,11 @@ class UpdateCartView(View):
         response = render(request, 'cart/partials/cart_item.html', {'item': item})
         response['HX-Trigger'] = 'update-menu-cart'
         return response
+
+
+def hx_menu_cart(request):
+    return render(request, 'cart/menu_cart.html')
+
+
+def hx_cart_total(request):
+    return render(request, 'cart/partials/cart_total.html')
