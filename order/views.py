@@ -1,6 +1,5 @@
 import json
 
-import stripe as stripe
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,70 +10,36 @@ from django.views import View, generic
 
 from cart.cart import Cart
 from order.models import Order, OrderItem, ShippingAddress
+from order.services import items_stripe_obj, create_stripe_session
 
 User = get_user_model()
 
 
-class StartOrderView(LoginRequiredMixin, View):
-    def cart(self):
-        cart = Cart(self.request)
-        return cart
-
-    def request_data(self):
-        data = json.loads(self.request.body)
-        return data
-
-    def items_stripe_obj(self):
-        cart = self.cart()
-        total_price = 0
-
-        items = []
-
-        for item in cart:
-            product = item['product']
-            total_price += product.price * int(item['quantity'])
-
-            obj = {
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': product.name,
-                    },
-                    'unit_amount': product.price,
-                },
-                'quantity': item['quantity']
-            }
-
-            items.append(obj)
-        return items
-
-    def create_stripe_session(self, items):
-        stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
-        session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=items,
-            mode='payment',
-            success_url=settings.SUCCESS_URL,
-            cancel_url=settings.CANCEL_URL
-        )
-        return session
-
+class StartOrderView(View):
     def post(self, request, *args, **kwargs):
-        cart = self.cart()
-        data = self.request_data()
+        cart = Cart(request)
+        data = json.loads(self.request.body)
         total_price = 0
 
-        items = self.items_stripe_obj()
+        items = items_stripe_obj(request)
 
-        session = self.create_stripe_session(items)
+        session = create_stripe_session(request, items)
         payment_intent = session.payment_intent
 
-        order_data = data['address']
-        # order_data = request.POST.get('address')
-        # order_data = request.POST.dict()
-        # order_data.pop('csrfmiddlewaretoken', None)
+        if request.user.is_authenticated:
 
-        order = Order.objects.create(address_id=order_data, user=request.user)
+            order_data = data['address']
+            # order_data = request.POST.get('address')
+            # order_data = request.POST.dict()
+            # order_data.pop('csrfmiddlewaretoken', None)
+
+            order = Order.objects.create(address_id=order_data, user=request.user)
+        else:
+            order_data = request.POST.dict()
+            order_data.pop('csrfmiddlewaretoken', None)
+
+            order = Order.objects.create(**order_data)
+
         order.payment_intent = payment_intent
         order.paid_amount = total_price
         order.paid = True
@@ -116,7 +81,7 @@ class EditAddressView(LoginRequiredMixin, generic.UpdateView):
     context_object_name = 'shipping'
 
 
-class CheckoutView(LoginRequiredMixin, generic.TemplateView):
+class CheckoutView(generic.TemplateView):
     template_name = 'order/checkout.html'
 
     def get_context_data(self, **kwargs):

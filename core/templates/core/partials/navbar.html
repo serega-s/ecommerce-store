@@ -1,0 +1,50 @@
+<nav class="border-b border-gray-300">
+  <div class="max-w-6xl mx-auto py-2 px-6 xl:px-0 flex items-center justify-between">
+    <div class="menu-left flex items-center space-x-6">
+      <a
+          href="{% url 'frontpage' %}"
+          class="py-4 text-lg text-purple-500 font-semibold"
+      >Nordic Homes</a>
+
+      <ul class="flex items-center space-x-4">
+        <li><a href="{% url 'shop' %}">Shop</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-right flex items-center space-x-4">
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'myaccount' %}">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+          >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}"
+           class="py-2 px-2 font-medium text-gray-500 bg-green-300 rounded hover:bg-green-500 hover:text-white transition duration-300">Log
+          In</a>
+        <a href="{% url 'logout' %}"
+           class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Sign
+          Up</a>
+      {% endif %}
+      <div
+          hx-get="{% url 'hx_menu_cart' %}"
+          hx-trigger="update-menu-cart from:body"
+          hx-swap="innerHTML"
+      >
+        {% include 'cart/menu_cart.html' %}
+      </div>
+    </div>
+  </div>
+</nav>

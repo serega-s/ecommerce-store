@@ -1,0 +1,176 @@
+<div class="max-w-6xl mx-auto flex flex-wrap items-start py-6 px-6 xl:px-0">
+  <div class="products w-full lg:w-3/4">
+    <h1 class="mb-5 text-3xl">Checkout</h1>
+
+    <div class="w-full pr-6">
+      <div class="mb-6 p-6 bg-gray-100 rounded-xl">
+        <h2 class="mb-5 uppercase text-lg">Shipping information</h2>
+
+        <div class="flex space-x-6">
+          <div class="w-1/2 mb-4">
+            <label class="inline-block mb-2">First name</label>
+            <input
+                type="text" class="w-full p-5 rounded-xl" placeholder="First Name"
+                value="{{ request.user.first_name }}" name="first_name">
+          </div>
+
+          <div class="w-1/2 mb-4">
+            <label class="inline-block mb-2">Last name</label>
+            <input
+                type="text" class="w-full p-5 rounded-xl"
+                placeholder="Last Name"
+                name="last_name"
+                value="{{ request.user.last_name }}">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="inline-block mb-2">Address</label>
+          <input type="text" class="w-full p-5 rounded-xl" name="address" placeholder="Address">
+        </div>
+
+        <div class="flex space-x-6">
+          <div class="w-1/2 mb-4">
+            <label class="inline-block mb-2">Zip code</label>
+            <input type="text" class="w-full p-5 rounded-xl" name="zipcode" placeholder="Zip Code">
+          </div>
+
+          <div class="w-1/2 mb-4">
+            <label class="inline-block mb-2">City/Place</label>
+            <input type="text" class="w-full p-5 rounded-xl" placeholder="City/Place" name="place">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6 p-6 bg-gray-100 rounded-xl">
+        <h2 class="mb-5 uppercase text-lg">Contact information</h2>
+
+        <div class="mb-4">
+          <label class="inline-block mb-2">Email</label>
+          <input type="email" class="w-full p-5 rounded-xl" name="email" placeholder="Email"
+                 value="{{ request.user.email }}">
+        </div>
+
+        <div class="mb-4">
+          <label class="inline-block mb-2">Phone</label>
+          <input type="phone" class="w-full p-5 rounded-xl" name="phone" placeholder="Phone">
+        </div>
+      </div>
+
+      <div class="mb-6 p-6 bg-gray-100 rounded-xl">
+        <h2 class="mb-5 uppercase text-lg">Payment information</h2>
+      </div>
+      <div class="mb-6 p-6 bg-red-100 rounded-xl" id="errors" hidden>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary w-full w-1/4 p-6 bg-gray-100 rounded-xl mt-3">
+    <h2 class="uppercase text-lg mb-5">Summary</h2>
+
+    <div class="mb-6 flex justify-between">
+      <span class="font-semibold">Total</span>
+      <span>${{ cart.get_total_cost }}</span>
+    </div>
+
+    <button
+        onclick="buy(event)"
+        class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white"
+    >
+      Confirm checkout
+    </button>
+  </div>
+</div>
+<script>
+  const buyButton = document.querySelector("button[type=submit]")
+  const selectAddress = document.querySelector("select[name=address]")
+  const errorsEl = document.querySelector("#errors")
+
+  const validateForm = (data) => {
+    let errors = []
+
+    if (!data.first_name) {
+      errors.push("First name is empty")
+    }
+
+    if (!data.last_name) {
+      errors.push("Last name is empty")
+    }
+
+    if (!data.email) {
+      errors.push("Email is empty")
+    }
+
+    if (!data.phone) {
+      errors.push("Phone is empty")
+    }
+
+    if (!data.address) {
+      errors.push("Address is empty")
+    }
+
+    if (!data.zipcode) {
+      errors.push("Zipcode is empty")
+    }
+
+    if (!data.place) {
+      errors.push("Place is empty")
+    }
+
+    let html = "<ul>"
+    if (errors.length) {
+      errors.forEach((error) => {
+        html += `<li>${error}</li>`
+      })
+      errorsEl.insertAdjacentHTML("beforeend", `${html}</ul>`)
+      errorsEl.style.display = "block"
+    } else {
+      errorsEl.insertAdjacentHTML("beforeend", ``)
+      errorsEl.style.display = "none"
+    }
+
+    return errors
+  }
+
+  const buy = (event) => {
+    event.preventDefault()
+
+    const data = {
+      "first_name": document.querySelector("input[name=first_name]").value,
+      "last_name": document.querySelector("input[name=last_name]").value,
+      "email": document.querySelector("input[name=email]").value,
+      "phone": document.querySelector("input[name=phone]").value,
+      "address": document.querySelector("input[name=address]").value,
+      "zipcode": document.querySelector("input[name=zipcode]").value,
+      "place": document.querySelector("input[name=place]").value,
+    }
+
+    let errors = validateForm(data)
+
+    if (!errors.length) {
+      const stripe = Stripe('{{ pub_key }}')
+
+      fetch('{% url 'start_order' %}', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": '{{ csrf_token }}'
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(data)
+      })
+          .then((response) => response.json())
+          .then((session) => stripe.redirectToCheckout({sessionId: session.session.id}))
+          .then((result) => {
+            if (result.error) {
+              alert(result.error.message)
+            }
+          })
+          .catch((error) => {
+            console.log("Errors: ", error)
+          })
+    }
+
+    return false
+  }
+</script>

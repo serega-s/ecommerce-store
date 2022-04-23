@@ -11,6 +11,8 @@
 
       <a href="{% url 'edit_myaccount' %}" class="inline-block mt-4 py-4 px-6 rounded-xl text-white bg-purple-500">
         Edit </a>
+      <a href="{% url 'logout' %}" class="inline-block mt-3 py-3 px-4 rounded-xl text-white bg-yellow-500">
+        Log out </a>
     </div>
 
     <hr>
@@ -56,12 +58,13 @@
         <div class="mb-6 w-full">
           {% for item in order.items.all %}
             <div class="product mb-6 flex pr-6">
-              <a href="#" class="w-1/4"> <img class="hover:shadow-lg rounded-xl" src="{{ item.product.get_thumbnail }}">
+              <a href="{% url 'product' item.product.slug %}" class="w-1/4"> <img class="hover:shadow-lg rounded-xl"
+                                                                                  src="{{ item.product.get_thumbnail }}">
               </a>
 
               <div class="w-3/4 pl-6">
                 <div class="flex justify-between">
-                  <a href="#" class="text-lg">{{ item.product.name }}</a>
+                  <a href="{% url 'product' item.product.slug %}" class="text-lg">{{ item.product.name }}</a>
 
                   <p class="mb-6 pt-1 text-gray-400">${{ item.product.price }}</p>
                 </div>
