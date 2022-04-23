@@ -69,6 +69,11 @@
           </label>
         </div>
 
+        Have an account?<a
+          href="{% url 'login' %}"
+          class="text-purple-500 hover:text-purple-800"
+      > Click here</a>
+
         {% if form.errors %}
           {% for field in form %}
             {% for error in field.errors %}
