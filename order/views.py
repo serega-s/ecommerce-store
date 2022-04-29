@@ -33,17 +33,23 @@ class StartOrderView(View):
             # order_data = request.POST.dict()
             # order_data.pop('csrfmiddlewaretoken', None)
 
-            order = Order.objects.create(address_id=order_data, user=request.user)
+            order = Order.objects.create(
+                address_id=order_data,
+                user=request.user,
+                paid=True,
+                paid_amount=total_price
+            )
         else:
-            # order_data = request.POST.dict()
             order_data = data.dict()
             order_data.pop('csrfmiddlewaretoken', None)
 
-            order = Order.objects.create(**order_data)
+            order = Order.objects.create(
+                **order_data,
+                paid=True,
+                paid_amount=total_price
+            )
 
         order.payment_intent = payment_intent
-        order.paid_amount = total_price
-        order.paid = True
         order.save()
 
         _order_items = []
