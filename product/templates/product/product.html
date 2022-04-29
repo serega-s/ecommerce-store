@@ -117,8 +117,6 @@
         product_id: '{{ product.id }}'
       }
 
-      console.log("DATA", data)
-
       fetch('{% url 'review_product' %}', {
         method: "POST",
         headers: {
