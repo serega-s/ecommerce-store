@@ -91,7 +91,7 @@ class Cart(object):
 
     def get_total_cost(self):
         return sum(Decimal(item['price']) * item['quantity'] for item in
-                   self.cart.values())
+                   self.cart.values()) / 100
 
     def clear(self):
         del self.session[settings.CART_SESSION_ID]

@@ -28,7 +28,7 @@ class AddToCartView(View):
         product = get_object_or_404(Product, id=product_id)
         cart.add(product, update_quantity=True)
 
-        return render(request, 'cart/menu_cart.html')
+        return render(request, 'cart/partials/menu_cart.html')
 
 
 class UpdateCartView(View):
@@ -66,7 +66,7 @@ class UpdateCartView(View):
 
 
 def hx_menu_cart(request):
-    return render(request, 'cart/menu_cart.html')
+    return render(request, 'cart/partials/menu_cart.html')
 
 
 def hx_cart_total(request):
