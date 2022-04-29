@@ -74,7 +74,6 @@
     </div>
 
     <button
-        onclick="buy(event)"
         class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white"
     >
       Confirm checkout
@@ -173,4 +172,5 @@
 
     return false
   }
+  buyButton.addEventListener("click", buy)
 </script>

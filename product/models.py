@@ -1,8 +1,4 @@
-from io import BytesIO
-
-from PIL import Image
 from django.contrib.auth import get_user_model
-from django.core.files import File
 from django.db import models
 
 User = get_user_model()
@@ -19,19 +15,6 @@ class Category(models.Model):
         return self.name
 
 
-def make_thumbnail(image, size=(300, 300)):
-    img = Image.open(image)
-    img.convert('RGB')
-    img.thumbnail(size)
-
-    thumb_io = BytesIO()
-    img.save(thumb_io, 'JPEG', quality=85)
-
-    thumbnail = File(thumb_io, name=image.name)
-
-    return thumbnail
-
-
 class Product(models.Model):
     category = models.ForeignKey(
         Category, related_name='products', on_delete=models.CASCADE)
@@ -41,7 +24,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='uploads/', blank=True, null=True)
     thumbnail = models.ImageField(upload_to='uploads/', blank=True, null=True)
     slug = models.SlugField()
-    rating = models.DecimalField(max_digits=3, decimal_places=2, default=None, null=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -51,12 +34,12 @@ class Product(models.Model):
     def get_display_price(self):
         return self.price / 100
 
-    @property
     def get_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail.url
         else:
             if self.image:
+                from product.services import make_thumbnail
                 self.thumbnail = make_thumbnail(self.image)
                 self.save()
 
@@ -79,6 +62,9 @@ class ReviewProductRelation(models.Model):
     content = models.CharField(max_length=500)
     rate = models.PositiveSmallIntegerField(choices=RATE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user}: {self.content}, {self.rate}'
 
     def save(self, *args, **kwargs):
         from product.services import set_rating

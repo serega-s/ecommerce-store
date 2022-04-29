@@ -35,7 +35,8 @@ class StartOrderView(View):
 
             order = Order.objects.create(address_id=order_data, user=request.user)
         else:
-            order_data = request.POST.dict()
+            # order_data = request.POST.dict()
+            order_data = data.dict()
             order_data.pop('csrfmiddlewaretoken', None)
 
             order = Order.objects.create(**order_data)
