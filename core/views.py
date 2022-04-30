@@ -41,6 +41,7 @@ class ShopView(generic.ListView):
 
         if query := self.query:
             queryset = queryset.filter(
-                Q(name__icontains=query) | Q(description__icontains=query))
+                Q(name__icontains=query) | Q(description__icontains=query)
+            )
 
         return queryset

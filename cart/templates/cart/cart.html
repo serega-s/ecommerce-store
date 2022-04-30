@@ -24,8 +24,12 @@
         </span>
       </div>
 
-      <a href="{% url 'checkout' %}"
-         class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white">Checkout</a>
+      {% if cart|length %}
+        <a href="{% url 'checkout' %}"
+           class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white">Checkout</a>
+      {% else %}
+        <a class="inline-block px-8 py-4 rounded-xl bg-purple-300 hover:bg-purple-300 text-white">Checkout</a>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
